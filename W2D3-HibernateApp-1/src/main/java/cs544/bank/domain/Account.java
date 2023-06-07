@@ -1,17 +1,29 @@
 package cs544.bank.domain;
 
+import cs544.bank.EntityManagerHelper;
+import jakarta.persistence.*;
+
 import java.util.*;
 
 
+@Entity
 public class Account {
+	@Id
 	private long accountnumber;
-	private Collection<AccountEntry> entryList = new ArrayList<AccountEntry>();
+
+	@OneToMany(cascade=CascadeType.PERSIST)
+	private Collection<AccountEntry> entryList = new ArrayList<>();
+
+	@ManyToOne(cascade=CascadeType.PERSIST)
 	private Customer customer;
 
-	
+	public Account() {}
 	public Account (long accountnr){
 		this.accountnumber = accountnr;
 	}
+
+
+
 	public long getAccountnumber() {
 		return accountnumber;
 	}
@@ -28,20 +40,26 @@ public class Account {
 	public void deposit(double amount){
 		AccountEntry entry = new AccountEntry(new Date(), amount, "deposit", "", "");
 		entryList.add(entry);
+		EntityManager em = EntityManagerHelper.getCurrent();
+		em.persist(entry);
 	}
 	public void withdraw(double amount){
 		AccountEntry entry = new AccountEntry(new Date(), -amount, "withdraw", "", "");
-		entryList.add(entry);	
+		entryList.add(entry);
+		EntityManager em = EntityManagerHelper.getCurrent();
+		em.persist(entry);
 	}
 
 	private void addEntry(AccountEntry entry){
 		entryList.add(entry);
+		EntityManager em = EntityManagerHelper.getCurrent();
+		em.persist(entry);
 	}
 
 	public void transferFunds(Account toAccount, double amount, String description){
 		AccountEntry fromEntry = new AccountEntry(new Date(), -amount, description, ""+toAccount.getAccountnumber(), toAccount.getCustomer().getName());
 		AccountEntry toEntry = new AccountEntry(new Date(), amount, description, ""+toAccount.getAccountnumber(), toAccount.getCustomer().getName());
-		entryList.add(fromEntry);	
+		entryList.add(fromEntry);
 		toAccount.addEntry(toEntry);
 	}
 	
