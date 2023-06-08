@@ -7,6 +7,7 @@ import cs544.bank.dao.AccountDAO;
 import cs544.bank.dao.IAccountDAO;
 import cs544.bank.dao.JPAAccountDAO;
 import cs544.bank.domain.Account;
+import cs544.bank.domain.AccountEntry;
 import cs544.bank.domain.Customer;
 import cs544.bank.jms.IJMSSender;
 import cs544.bank.jms.JMSSender;
@@ -151,4 +152,9 @@ public class AccountService implements IAccountService {
 			jmsSender.sendJMSMessage("TransferFunds of $ "+amount+" from account with accountNumber= "+fromAccount+" to account with accountNumber= "+toAccount);
 		}
 	}
+
+//	public AccountEntry getEntryList(Account account) {
+//
+//
+//	}
 }

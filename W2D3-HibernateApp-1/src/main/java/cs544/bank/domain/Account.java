@@ -11,7 +11,7 @@ public class Account {
 	@Id
 	private long accountnumber;
 
-	@OneToMany(cascade=CascadeType.PERSIST)
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	private Collection<AccountEntry> entryList = new ArrayList<>();
 
 	@ManyToOne(cascade=CascadeType.PERSIST)
@@ -40,30 +40,20 @@ public class Account {
 	public void deposit(double amount){
 		AccountEntry entry = new AccountEntry(new Date(), amount, "deposit", "", "");
 		entryList.add(entry);
-		EntityManager em = EntityManagerHelper.getCurrent();
-		em.persist(entry);
 	}
 	public void withdraw(double amount){
 		AccountEntry entry = new AccountEntry(new Date(), -amount, "withdraw", "", "");
 		entryList.add(entry);
-		EntityManager em = EntityManagerHelper.getCurrent();
-		em.persist(entry);
 	}
 
 	private void addEntry(AccountEntry entry){
 		entryList.add(entry);
-		EntityManager em = EntityManagerHelper.getCurrent();
-		em.persist(entry);
 	}
 
 	public void transferFunds(Account toAccount, double amount, String description){
 		AccountEntry fromEntry = new AccountEntry(new Date(), -amount, description, ""+toAccount.getAccountnumber(), toAccount.getCustomer().getName());
 		AccountEntry toEntry = new AccountEntry(new Date(), amount, description, ""+toAccount.getAccountnumber(), toAccount.getCustomer().getName());
 		entryList.add(fromEntry);
-
-		EntityManager em = EntityManagerHelper.getCurrent();
-		em.persist(fromEntry);
-
 		toAccount.addEntry(toEntry);
 	}
 	
@@ -74,16 +64,7 @@ public class Account {
 		this.customer = customer;
 	}
 	public Collection<AccountEntry> getEntryList() {
-		EntityManager em = EntityManagerHelper.getCurrent();
-		em.getTransaction().begin();
-
-		TypedQuery<AccountEntry> query = em.createQuery("from AccountEntry ", AccountEntry.class);
-		Collection<AccountEntry> result = query.getResultList();
-
-		em.getTransaction().commit();
-		em.close();
-
-		return result;
+		return entryList;
 	}
 
 }

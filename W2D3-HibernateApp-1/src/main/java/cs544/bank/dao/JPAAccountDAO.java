@@ -24,7 +24,8 @@ public class JPAAccountDAO implements IAccountDAO{
     public Collection<Account> getAccounts() {
         EntityManager em = EntityManagerHelper.getCurrent();
 
-        TypedQuery<Account> query = em.createQuery("from Account ", Account.class);
+        TypedQuery<Account> query = em.createQuery("FROM Account", Account.class);
+//        TypedQuery<Account> query = em.createQuery("SELECT a FROM Account a JOIN a.entryList", Account.class);
         return query.getResultList();
     }
 }
