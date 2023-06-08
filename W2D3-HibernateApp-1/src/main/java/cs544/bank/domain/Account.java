@@ -32,7 +32,7 @@ public class Account {
 	}
 	public double getBalance() {
 		double balance=0;
-		for (AccountEntry entry : entryList) {
+		for (AccountEntry entry : getEntryList()) {
 			balance+=entry.getAmount();
 		}
 		return balance;
@@ -60,6 +60,10 @@ public class Account {
 		AccountEntry fromEntry = new AccountEntry(new Date(), -amount, description, ""+toAccount.getAccountnumber(), toAccount.getCustomer().getName());
 		AccountEntry toEntry = new AccountEntry(new Date(), amount, description, ""+toAccount.getAccountnumber(), toAccount.getCustomer().getName());
 		entryList.add(fromEntry);
+
+		EntityManager em = EntityManagerHelper.getCurrent();
+		em.persist(fromEntry);
+
 		toAccount.addEntry(toEntry);
 	}
 	
@@ -70,7 +74,16 @@ public class Account {
 		this.customer = customer;
 	}
 	public Collection<AccountEntry> getEntryList() {
-		return entryList;
+		EntityManager em = EntityManagerHelper.getCurrent();
+		em.getTransaction().begin();
+
+		TypedQuery<AccountEntry> query = em.createQuery("from AccountEntry ", AccountEntry.class);
+		Collection<AccountEntry> result = query.getResultList();
+
+		em.getTransaction().commit();
+		em.close();
+
+		return result;
 	}
 
 }
