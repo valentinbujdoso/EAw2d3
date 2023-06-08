@@ -1,28 +1,42 @@
 package cs544;
 
-import java.util.ArrayList;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StudentDAO {
+    public void saveStudent(Student student) {
+        EntityManager em = EntityManagerHelper.getCurrent();
+        em.persist(student);
+    }
+    public void updateStudent(Student student) {
+        EntityManager em = EntityManagerHelper.getCurrent();
+        em.merge(student);
+    }
+    public Student loadStudent(long studentid) {
+        EntityManager em = EntityManagerHelper.getCurrent();
 
-	private Collection<Student> studentlist = new ArrayList<Student>();
+//        EntityGraph<Student> entityGraph = em.createEntityGraph(Student.class);
+//        entityGraph.addAttributeNodes("studentid");
+//        entityGraph.addAttributeNodes("firstname");
+//
+//        Map<String, Object> properties = new HashMap<>();
+//        properties.put("jakarta.persistence.fetchgraph", entityGraph);
+//        Student student = em.find(Student.class, studentid, properties);
+//
+//        return student;
+        return em.find(Student.class, studentid);
+    }
 
-	public StudentDAO() {
-		Student student = new Student(12345, "Frank", "Brown");
-		Course course1 = new Course(1101, "Java", "A");
-		Course course2 = new Course(1102, "Math", "B-");
-		student.addCourse(course1);
-		student.addCourse(course2);
-		studentlist.add(student);
+    public Collection<Student> getAccounts() {
+        EntityManager em = EntityManagerHelper.getCurrent();
 
-	}
-
-	public Student load(long studentid) {
-		for (Student student : studentlist) {
-			if (student.getStudentid() == studentid) {
-				return student;
-			}
-		}
-		return null;
-	}
+        TypedQuery<Student> query = em.createQuery("FROM Student ", Student.class);
+//        TypedQuery<Account> query = em.createQuery("SELECT a FROM Account a JOIN a.entryList", Account.class);
+        return query.getResultList();
+    }
 }

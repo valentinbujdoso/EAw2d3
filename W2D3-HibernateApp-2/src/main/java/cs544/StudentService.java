@@ -1,5 +1,7 @@
 package cs544;
 
+import jakarta.persistence.EntityManager;
+
 public class StudentService {
 	private StudentDAO studentdao;
 
@@ -8,6 +10,15 @@ public class StudentService {
 	}
 
 	public Student getStudent(long studentid) {
-		return studentdao.load(studentid);
+		EntityManager em = EntityManagerHelper.getCurrent();
+		em.getTransaction().begin();
+
+		Student result = studentdao.loadStudent(studentid);
+
+		em.getTransaction().commit();
+		em.close();
+//		EntityManagerHelper.closeEntityManagerFactory();
+
+		return result;
 	}
 }
